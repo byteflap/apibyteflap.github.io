@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+        <title>问题反馈</title>
+        <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/2.3.0/weui.min.css"/>
+        <style>
+            body {
+                --weui-BG-0: #ededed;
+                --weui-BG-1: #f7f7f7;
+                --weui-BG-2: #fff;
+                --weui-BG-3: #f7f7f7;
+                --weui-BG-4: #4c4c4c;
+                --weui-BG-5: #fff;
+                --weui-FG-0: rgba(0,0,0,.9);
+                --weui-FG-HALF: rgba(0,0,0,.9);
+                --weui-FG-1: rgba(0,0,0,.5);
+                --weui-FG-2: rgba(0,0,0,.3);
+                --weui-FG-3: rgba(0,0,0,.1);
+                --weui-RED: #fa5151;
+                --weui-ORANGE: #fa9d3b;
+                --weui-YELLOW: #ffc300;
+                --weui-GREEN: #91d300;
+                --weui-LIGHTGREEN: #95ec69;
+                --weui-BRAND: #4381e5;
+                --weui-BLUE: #10aeff;
+                --weui-INDIGO: #1485ee;
+                --weui-PURPLE: #6467f0;
+                --weui-WHITE: #f4f8fb;
+                --weui-LINK: #576b95;
+                --weui-TEXTGREEN: #88ace7;
+                --weui-FG: #000;
+                --weui-BG: #f4f8fb;
+                --weui-TAG-TEXT-ORANGE: #fa9d3b;
+                --weui-TAG-BACKGROUND-ORANGE: rgba(250,157,59,.1);
+                --weui-TAG-TEXT-GREEN: #88ace7;
+                --weui-TAG-BACKGROUND-GREEN: rgba(6,174,86,.1);
+                --weui-TAG-TEXT-BLUE: #10aeff;
+                --weui-TAG-BACKGROUND-BLUE: rgba(16,174,255,.1);
+                --weui-TAG-TEXT-BLACK: rgba(0,0,0,.5);
+                --weui-TAG-BACKGROUND-BLACK: rgba(0,0,0,.05);
+            }
+        </style>
+    </head>
+    <body >
+        <div class="page">
+            <div class="weui-form">
+                <div class="weui-form__text-area">
+                    <h2 class="weui-form__title">小熊快启</h2>
+                    <div class="weui-form__desc">请在此反馈您的问题</div>
+                </div>
+
+                <div class="weui-form__control-area">
+                    <div class="weui-cells__group weui-cells__group_form">
+                        <div class="weui-cell weui-cell_active weui-cell_access weui-cell_select weui-cell_select-after">
+                                <div class="weui-cell__hd"><label class="weui-label">问题类型</label></div>
+                                <div class="weui-cell__bd" id="showPicker">请选择</div>
+                        </div>
+                        <div class="weui-cells__title">问题描述</div>
+                        <div class="weui-cells weui-cells_form">
+                            <div class="weui-cell ">
+                                <div class="weui-cell__bd">
+                                    <textarea id="textarea" class="weui-textarea" placeholder="请描述您的问题" rows="3"></textarea>
+                                    <div class="weui-textarea-counter"><span>0</span>/200</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="weui-form__opr-area">
+                <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips">确定</a>
+                </div>
+                <div id="toast" style="display: none;">
+                        <div class="weui-mask_transparent"></div>
+                        <div class="weui-toast">
+                            <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+                            <p class="weui-toast__content" id="toastText">已经收到您的反馈</p>
+                        </div>
+                </div>
+                <div class="js_dialog" id="iosDialog" style="display: none;">
+                        <div class="weui-mask"></div>
+                        <div class="weui-dialog">
+                            <div class="weui-dialog__bd" id="iosDialogText"></div>
+                            <div class="weui-dialog__ft">
+                                <a href="javascript:hideAlert()" class="weui-dialog__btn weui-dialog__btn_primary">知道了</a>
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+
+<script src='https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js'></script>
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script src="https://res.wx.qq.com/open/libs/weuijs/1.2.1/weui.min.js"></script>
+<script type="text/javascript">
+    $('#showPicker').on('click', function () {
+        weui.picker([{
+            label: '请选择',
+            disabled: true,
+            value: '请选择'
+        },{
+            label: '找不到想要的图标',
+            value: '找不到想要的图标'
+        }, {
+            label: '我需要某个App的Scheme',
+            value: '我需要某个App的Scheme'
+        }, {
+            label: '我提供某个App的Scheme',
+            value: '我提供某个App的Scheme'
+        },{
+            label: '其他',
+            value: '其他'
+        }], {
+            onChange: function (result) {
+            },
+            onConfirm: function (result) {
+                $('#showPicker').text(result);
+            },
+            title: '请选择类型'
+        });
+    });
+
+    $('#showTooltips').on('click', function () {
+        var content = $("#textarea").val();
+        var title = $("#showPicker").text();
+        if(title == "请选择"){
+            alertText("请选择问题类型");
+            return;
+        }
+
+        if(!content || content == ""){
+            alertText("请填写问题描述");
+            return;
+        }
+
+        if(content.length > 1000){
+            alertText("问题描述太长了");
+            return;
+        }
+
+        title = "【小熊快启问题反馈】" + title;
+
+        $.ajax({
+            url: 'https://sc.ftqq.com/SCU24444Taf0727689c03b5974b74eed8c57703875ac9da79a02f2.send',
+            method: 'GET',
+            dataType: 'jsonp',
+            data:{
+                text: title,
+                desp: content
+            },
+            success: function(resp){
+                if(resp.errno && resp.errno == 0){
+                    toastText("已经收到您的反馈，谢谢");
+                }else{
+                    toastText("已经收到您的反馈，谢谢");
+                    // alertText("请求出现错误：",JSON.stringify(resp));
+                }
+                console.log(resp);
+            },
+            error: function(err){
+                toastText("已经收到您的反馈，谢谢");
+                // alertText("请求出现错误");
+                console.log(err);
+            }
+        });
+
+    });
+
+    function hideAlert(){
+        $("#iosDialog").fadeOut(300);
+    }
+
+    function alertText(msg){
+        $("#iosDialogText").text(msg);
+        $("#iosDialog").fadeIn(300);
+    }
+
+    function toastText(msg){
+        $("#toastText").text(msg);
+        $("#toast").fadeIn(300);
+        setTimeout(() => {
+            $("#toast").fadeOut(300);
+        }, 2000);
+    }
+</script>
